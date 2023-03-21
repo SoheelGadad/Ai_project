@@ -1,0 +1,62 @@
+import os
+import csv
+from tkinter import filedialog
+from tkinter import Tk
+from PIL import Image
+from webcolors import rgb_to_name, rgb_to_hex
+from tqdm import tqdm
+
+# Create a Tkinter root window (hidden) to allow file dialog to be displayed
+root = Tk()
+root.withdraw()
+
+# Ask the user to select an image file using a file dialog
+image_file = filedialog.askopenfilename(title='Select Image File', filetypes=[('Image Files', '*.jpg;*.jpeg;*.png;*.gif')])
+
+# Open the image file
+im = Image.open(image_file)
+
+# Create a set to store the named colors found in the image
+named_colors_set = set()
+
+# Iterate through each pixel in the image and convert its RGB color to a named color (if possible)
+for pixel in tqdm(im.getdata(), desc='Processing Image'):
+    try:
+        color_name = rgb_to_name(pixel)
+        hex_code = rgb_to_hex(pixel)
+        named_colors_set.add((color_name, pixel, hex_code))
+    except ValueError:
+        pass
+
+# Convert the set to a list and sort it alphabetically by color name
+named_colors = sorted(list(named_colors_set), key=lambda x: x[0])
+
+# Save the named colors, their RGB values, and hex codes to a CSV file
+csv_file = 'named_colors.csv'
+if os.path.exists(csv_file):
+    with open(csv_file, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        existing_rows = list(reader)
+else:
+    existing_rows = []
+
+with open(csv_file, 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['color_name', 'red', 'green', 'blue', 'hex_code'])
+    
+    for color in tqdm(named_colors, desc='Saving Data'):
+        color_name = color[0]
+        r, g, b = color[1]
+        hex_code = color[2]
+        
+        # Check if the color is already in the CSV file
+        color_exists = False
+        for row in existing_rows:
+            if row[0] == color_name and row[1] == str(r) and row[2] == str(g) and row[3] == str(b) and row[4] == hex_code:
+                color_exists = True
+                break
+                
+        if not color_exists:
+            writer.writerow([color_name, r, g, b, hex_code])
+        
+print('Named colors, RGB values, and hex codes saved to', csv_file)

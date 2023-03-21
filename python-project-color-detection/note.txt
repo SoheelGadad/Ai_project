@@ -1,0 +1,863 @@
+ To run python file use:
+ python color_detection.py
+
+ to stop running press Esc
+
+If the user double-clicks on the image, clicked is set to True, and the RGB values of the clicked pixel are extracted.
+----------------------------Version1.1----------------------------------
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+
+#Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=True, help="Image Path")
+args = vars(ap.parse_args())
+img_path = args['image']
+
+#Reading the image with opencv
+img = cv2.imread(img_path)
+
+#declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+#Reading csv file with pandas and giving names to each column
+index=["color","color_name","hex","R","G","B"]
+csv = pd.read_csv('colors.csv', names=index, header=None)
+
+#function to calculate minimum distance from all colors and get the most matching color
+def getColorName(R,G,B):
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+        if(d<=minimum):
+            minimum = d
+            cname = csv.loc[i,"color_name"]
+    return cname
+
+#function to get x,y coordinates of mouse double click
+def draw_function(event, x,y,flags,param):
+    if event == cv2.EVENT_LBUTTONDBLCLK:
+        global b,g,r,xpos,ypos, clicked
+        clicked = True
+        xpos = x
+        ypos = y
+        b,g,r = img[y,x]
+        b = int(b)
+        g = int(g)
+        r = int(r)
+       
+cv2.namedWindow('image')
+cv2.setMouseCallback('image',draw_function)
+
+while(1):
+
+    cv2.imshow("image",img)
+    if (clicked):
+   
+        #cv2.rectangle(image, startpoint, endpoint, color, thickness)-1 fills entire rectangle 
+        cv2.rectangle(img,(20,20), (750,60), (b,g,r), -1)
+
+        #Creating text string to display( Color name and RGB values )
+        text = getColorName(r,g,b) + ' R='+ str(r) +  ' G='+ str(g) +  ' B='+ str(b)
+        
+        #cv2.putText(img,text,start,font(0-7),fontScale,color,thickness,lineType )
+        cv2.putText(img, text,(50,50),2,0.8,(255,255,255),2,cv2.LINE_AA)
+
+        #For very light colours we will display text in black colour
+        if(r+g+b>=600):
+            cv2.putText(img, text,(50,50),2,0.8,(0,0,0),2,cv2.LINE_AA)
+            
+        clicked=False
+
+    #Break the loop when user hits 'esc' key    
+    if cv2.waitKey(20) & 0xFF ==27:
+        break
+    
+cv2.destroyAllWindows()
+--------------------------------------Version1.2----------------------------------
+#If the user single-clicks on the image, clicked is set to True, and the RGB values of the clicked pixel are extracted.
+#The draw_function() has been modified to detect the color with a single left click event, and the cv2.EVENT_LBUTTONDBLCLK has been replaced with cv2.EVENT_LBUTTONDOWN.
+#The while loop now checks for a
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+import tkinter as tk
+from tkinter import filedialog
+
+#Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=False, help="Image Path")
+args = vars(ap.parse_args())
+
+root = tk.Tk()
+root.withdraw()
+
+#Open file dialog to select an image
+file_path = filedialog.askopenfilename()
+
+if file_path:
+    img_path = file_path
+elif args["image"]:
+    img_path = args["image"]
+else:
+    print("Please provide an image path")
+
+#Reading the image with opencv
+img = cv2.imread(img_path)
+
+#declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+#Reading csv file with pandas and giving names to each column
+index=["color","color_name","hex","R","G","B"]
+csv = pd.read_csv('colors.csv', names=index, header=None)
+
+#function to calculate minimum distance from all colors and get the most matching color
+def getColorName(R,G,B):
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+        if(d<=minimum):
+            minimum = d
+            cname = csv.loc[i,"color_name"]
+    return cname
+
+#function to get x,y coordinates of mouse click
+def draw_function(event, x,y,flags,param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        global b,g,r,xpos,ypos, clicked
+        clicked = True
+        xpos = x
+        ypos = y
+        b,g,r = img[y,x]
+        b = int(b)
+        g = int(g)
+        r = int(r)
+
+cv2.namedWindow('image')
+cv2.setMouseCallback('image',draw_function)
+
+while(1):
+
+    cv2.imshow("image",img)
+    if (clicked):
+   
+        #cv2.rectangle(image, startpoint, endpoint, color, thickness)-1 fills entire rectangle 
+        cv2.rectangle(img,(20,20), (750,60), (b,g,r), -1)
+
+        #Creating text string to display( Color name and RGB values )
+        text = getColorName(r,g,b) + ' R='+ str(r) +  ' G='+ str(g) +  ' B='+ str(b)
+        
+        #cv2.putText(img,text,start,font(0-7),fontScale,color,thickness,lineType )
+        cv2.putText(img, text,(50,50),2,0.8,(255,255,255),2,cv2.LINE_AA)
+
+        #For very light colours we will display text in black colour
+        if(r+g+b>=600):
+            cv2.putText(img, text,(50,50),2,0.8,(0,0,0),2,cv2.LINE_AA)
+            
+        clicked=False
+
+    #Break the loop when user hits 'esc' key    
+    if cv2.waitKey(20) & 0xFF ==27:
+        break
+    
+cv2.destroyAllWindows()
+--------------------------------------Version1.3----------------------------------
+#update code 
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+import tkinter as tk
+from tkinter import filedialog
+
+#Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=False, help="Image Path")
+args = vars(ap.parse_args())
+
+root = tk.Tk()
+root.withdraw()
+
+#Open file dialog to select an image
+file_path = filedialog.askopenfilename()
+
+if file_path:
+    img_path = file_path
+elif args["image"]:
+    img_path = args["image"]
+else:
+    print("Please provide an image path")
+
+#Reading the image with opencv
+img = cv2.imread(img_path)
+
+#declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+#Reading csv file with pandas and giving names to each column
+index=["color","color_name","hex","R","G","B"]
+csv = pd.read_csv('colors.csv', names=index, header=None)
+
+#function to calculate minimum distance from all colors and get the most matching color
+def getColorName(R,G,B):
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+        if(d<=minimum):
+            minimum = d
+            cname = csv.loc[i,"color_name"]
+    return cname
+
+#function to get x,y coordinates of mouse double click
+def draw_function(event, x,y,flags,param):
+    if event == cv2.EVENT_LBUTTONDBLCLK:
+        global b,g,r,xpos,ypos, clicked
+        clicked = True
+        xpos = x
+        ypos = y
+        b,g,r = img[y,x]
+        b = int(b)
+        g = int(g)
+        r = int(r)
+       
+cv2.namedWindow('image')
+cv2.setMouseCallback('image',draw_function)
+
+while(1):
+
+    cv2.imshow("image",img)
+    if (clicked):
+   
+        #cv2.rectangle(image, startpoint, endpoint, color, thickness)-1 fills entire rectangle 
+        cv2.rectangle(img,(20,20), (750,60), (b,g,r), -1)
+
+        #Creating text string to display( Color name and RGB values )
+        text = getColorName(r,g,b) + ' R='+ str(r) +  ' G='+ str(g) +  ' B='+ str(b)
+        
+        #cv2.putText(img,text,start,font(0-7),fontScale,color,thickness,lineType )
+        cv2.putText(img, text,(50,50),2,0.8,(255,255,255),2,cv2.LINE_AA)
+
+        #For very light colours we will display text in black colour
+        if(r+g+b>=600):
+            cv2.putText(img, text,(50,50),2,0.8,(0,0,0),2,cv2.LINE_AA)
+            
+        clicked=False
+
+    #Break the loop when user hits 'esc' key    
+    if cv2.waitKey(20) & 0xFF ==27:
+        break
+    
+cv2.destroyAllWindows()
+----------------------------------------------------------
+#this code have resize image after uploading
+
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+import tkinter as tk
+from tkinter import filedialog
+
+#Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=False, help="Image Path")
+args = vars(ap.parse_args())
+
+root = tk.Tk()
+root.withdraw()
+
+#Open file dialog to select an image
+file_path = filedialog.askopenfilename()
+
+if file_path:
+    img_path = file_path
+elif args["image"]:
+    img_path = args["image"]
+else:
+    print("Please provide an image path")
+
+#Reading the image with opencv
+img = cv2.imread(img_path)
+
+#declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+#Reading csv file with pandas and giving names to each column
+index=["color","color_name","hex","R","G","B"]
+csv = pd.read_csv('colors.csv', names=index, header=None)
+
+#function to calculate minimum distance from all colors and get the most matching color
+def getColorName(R,G,B):
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+        if(d<=minimum):
+            minimum = d
+            cname = csv.loc[i,"color_name"]
+    return cname
+
+#function to get x,y coordinates of mouse click
+def draw_function(event, x,y,flags,param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        global b,g,r,xpos,ypos, clicked
+        clicked = True
+        xpos = x
+        ypos = y
+        b,g,r = img[y,x]
+        b = int(b)
+        g = int(g)
+        r = int(r)
+
+# callback function for zoom trackbar
+def zoom_callback(x):
+    global zoom_level
+    zoom_level = x
+
+cv2.namedWindow('image')
+cv2.setMouseCallback('image',draw_function)
+
+# create trackbar for zoom level
+cv2.createTrackbar('Zoom', 'image', 0, 20, zoom_callback)
+while(1):
+
+    # create a scaled copy of the image based on zoom level
+   # create a scaled copy of the image based on zoom level
+    max_size = 800  # maximum size of the image
+    scale_percent = min(max_size / img.shape[1], max_size / img.shape[0]) * 100
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    scaled_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
+    cv2.imshow("image",scaled_img)
+    if (clicked):
+    # cv2.rectangle(image, startpoint, endpoint, color, thickness)-1 fills entire rectangle
+     cv2.rectangle(img, (20, 20), (750, 60), (b, g, r), -1)
+
+    # Creating text string to display (Color name and RGB values)
+    text = getColorName(r, g, b) + ' R=' + str(r) + ' G=' + str(g) + ' B=' + str(b)
+
+    # cv2.putText(img,text,start,font(0-7),fontScale,color,thickness,lineType)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 10
+    thickness = 2
+    text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
+    text_x = 50
+    text_y = 50
+    if text_x + text_size[0] >= img.shape[1]:
+            text_x = img.shape[1] - text_size[0] - 10
+    if text_y + text_size[1] >= img.shape[0]:
+            text_y = img.shape[0] - text_size[1] - 10
+    cv2.putText(img, text, (text_x, text_y), font, font_scale, (255, 255, 255), thickness, cv2.LINE_AA)
+
+    # For very light colors we will display text in black color
+    if (r + g + b >= 600):
+        font_scale = 0.8
+        cv2.putText(img, text, (text_x, text_y), font, font_scale, (0, 0, 0), thickness, cv2.LINE_AA)
+
+    # Adding Zoom functionality
+    key = cv2.waitKey(1)
+    if key == ord('+'): # Zoom in
+        img = cv2.resize(img, None, fx=1.1, fy=1.1, interpolation=cv2.INTER_LINEAR)
+    elif key == ord('-'): # Zoom out
+        img = cv2.resize(img, None, fx=0.9, fy=0.9, interpolation=cv2.INTER_LINEAR)
+
+    #Break the loop when user hits 'esc' key    
+    if key == 27: # 'esc' key
+        break
+    elif cv2.getWindowProperty('image', cv2.WND_PROP_VISIBLE) < 1: # window closed by user
+        break
+
+cv2.destroyAllWindows()
+---------------------------------------------------------------
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+import tkinter as tk
+from tkinter import filedialog
+
+#Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=False, help="Image Path")
+args = vars(ap.parse_args())
+
+root = tk.Tk()
+root.withdraw()
+
+#Open file dialog to select an image
+file_path = filedialog.askopenfilename()
+
+if file_path:
+    img_path = file_path
+elif args["image"]:
+    img_path = args["image"]
+else:
+    print("Please provide an image path")
+
+#Reading the image with opencv
+img = cv2.imread(img_path)
+
+#declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+#Reading csv file with pandas and giving names to each column
+index=["color","color_name","hex","R","G","B"]
+csv = pd.read_csv('colors.csv', names=index, header=None)
+
+#function to calculate minimum distance from all colors and get the most matching color
+def getColorName(R,G,B):
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+        if(d<=minimum):
+            minimum = d
+            cname = csv.loc[i,"color_name"]
+    return cname
+
+#function to get x,y coordinates of mouse click
+def draw_function(event, x,y,flags,param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        global b,g,r,xpos,ypos, clicked
+        clicked = True
+        xpos = x
+        ypos = y
+        b,g,r = img[y,x]
+        b = int(b)
+        g = int(g)
+        r = int(r)
+
+cv2.namedWindow('image')
+cv2.setMouseCallback('image',draw_function)
+while(1):
+
+    # create a scaled copy of the image based on zoom level
+    max_size = 800  # maximum size of the image
+    scale_percent = min(max_size / img.shape[1], max_size / img.shape[0]) * 100
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    scaled_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
+    cv2.imshow("image",scaled_img)
+    if clicked:
+        cv2.rectangle(img, (20, 20), (750, 60), (b, g, r), -1)
+        text = getColorName(r, g, b) + ' R=' + str(r) + ' G=' + str(g) + ' B=' + str(b)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 10
+        thickness = 2
+        text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
+        text_x = 50
+        text_y = 50
+        if text_x + text_size[0] >= img.shape[1]:
+            text_x = img.shape[1] - text_size[0] - 10
+        if text_y + text_size[1] >= img.shape[0]:
+            text_y = img.shape[0] - text_size[1] - 10
+        cv2.putText(img, text, (text_x, text_y), font, font_scale, (255, 255, 255), thickness, cv2.LINE_AA,)
+        if (r + g + b >= 600):
+            cv2.putText(img, text, (50, 50), 2, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+
+  # Adding Zoom functionality
+    key = cv2.waitKey(1)
+    if key == ord('+'): # Zoom in
+        img = cv2.resize(img, None, fx=1.1, fy=1.1, interpolation=cv2.INTER_LINEAR)
+    elif key == ord('-'): # Zoom out
+        img = cv2.resize(img, None, fx=0.9, fy=0.9, interpolation=cv2.INTER_LINEAR)
+
+    #Break the loop when user hits 'esc' key    
+    if key == 27: # 'esc' key
+        break
+    elif cv2.getWindowProperty('image', cv2.WND_PROP_VISIBLE) < 1: # window closed by user
+        break
+
+cv2.destroyAllWindows()
+----------------------------------------scenner---------------------------------------------
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+import tkinter as tk
+from tkinter import filedialog
+
+# Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=False, help="Image Path")
+args = vars(ap.parse_args())
+
+root = tk.Tk()
+root.withdraw()
+
+# Open file dialog to select an image
+file_path = filedialog.askopenfilename()
+
+if file_path:
+    img_path = file_path
+elif args["image"]:
+    img_path = args["image"]
+else:
+    print("Please provide an image path")
+
+# Reading the image with opencv
+img = cv2.imread(img_path)
+
+# Declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+# Reading csv file with pandas and giving names to each column
+csv = pd.read_csv('colors.csv')
+
+# Function to calculate minimum distance from all colors and get the most matching color
+def getColorName(R, G, B):
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(R - int(csv.loc[i, "R"])) + abs(G - int(csv.loc[i, "G"])) + abs(B - int(csv.loc[i, "B"]))
+        if(d <= minimum):
+            minimum = d
+            cname = csv.loc[i, "color_name"]
+    return cname
+
+# Function to get x,y coordinates of mouse click
+def draw_function(event, x, y, flags, param):
+    if event == cv2.EVENT_MOUSEMOVE:
+        global b, g, r
+        b, g, r = img[y, x]
+        color_scanner = np.zeros((300, 300, 3), np.uint8)
+        color_scanner[:, :] = (b, g, r)
+        cv2.putText(color_scanner, "B: {} G: {} R: {}".format(b, g, r), (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        cv2.imshow('color_scanner', color_scanner)
+
+cv2.namedWindow('image')
+cv2.setMouseCallback('image', draw_function)
+
+
+while True:
+    # Set maximum size of the image
+    max_size = 800 
+
+    # Calculate the scale percent based on the maximum size and the image's original size
+    scale_percent = min(max_size / img.shape[1], max_size / img.shape[0]) * 100
+
+    # Calculate the new dimensions of the scaled image
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+
+    # Resize the image
+    scaled_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
+    # Display the scaled image
+    cv2.imshow("image", scaled_img)
+
+    # Update the color rectangle and text when the user clicks on the image
+    # Update the color rectangle and text when the user clicks on the image
+    text = ""
+    if clicked:
+        cv2.rectangle(img, (20, 20), (750, 60), (b, g, r), -1)
+        text = getColorName(r, g, b) + ' R=' + str(r) + ' G=' + str(g) + ' B=' + str(b)
+
+    # Set font properties
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1
+    thickness = 2
+
+    # Get the size of the text
+    text_size, _ = cv2.getTextSize(text, font, font_scale, thickness)
+
+    # Position the text within the color rectangle
+    text_x = 50
+    text_y = 50
+    if text_x + text_size[0] >= img.shape[1]:
+        text_x = img.shape[1] - text_size[0] - 10
+    if text_y + text_size[1] >= img.shape[0]:
+        text_y = img.shape[0] - text_size[1] - 10
+
+    # Set the font color based on the brightness of the color
+    font_color = (0, 0, 0) if r + g + b >= 600 else (255, 255, 255)
+
+    # Add the text to the image
+    cv2.putText(img, text, (text_x, text_y), font, font_scale, font_color, thickness, cv2.LINE_AA)
+
+# Wait for the space bar to be pressed to scan colors
+    if cv2.waitKey(20) & 0xFF == 32:
+        cv2.destroyAllWindows()
+
+# Wait for the space bar to be pressed to scan colors
+    if cv2.waitKey(20) & 0xFF == 32:  
+     cv2.destroyAllWindows()
+
+    # Get the height and width of the image
+    h, w, _ = img.shape  
+
+    # Create an empty image for the color scan result
+    color_scan = np.zeros([h, w, 3])  
+
+    # Fill the color scan image with selected pixels if they exist within the image
+    if ypos - 10 >= 0 and ypos + 10 < h and xpos - 10 >= 0 and xpos + 10 < w:
+        color_scan[:, :, :] = img[ypos - 10:ypos + 10, xpos - 10:xpos + 10, :]
+    else:
+        color_scan[:, :, :] = 255 # set color to white if selected pixels are outside the image
+    # Display the color scan result
+    cv2.imshow("Color Scan Result", color_scan)
+
+# Adding Zoom functionality
+    key = cv2.waitKey(1)
+    if key == ord('+'): # Zoom in
+        img = cv2.resize(img, None, fx=1.1, fy=1.1, interpolation=cv2.INTER_LINEAR)
+    elif key == ord('-'): # Zoom out
+        img = cv2.resize(img, None, fx=0.9, fy=0.9, interpolation=cv2.INTER_LINEAR)
+
+#Break the loop when user hits 'esc' key
+    if key == 27: # 'esc' key
+        break
+    elif cv2.getWindowProperty('image', cv2.WND_PROP_VISIBLE) < 1: # window closed by user
+        break
+cv2.destroyAllWindows()
+-----------------------------------------------------------------------------------------------
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+import tkinter as tk
+from tkinter import filedialog
+
+# Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=False, help="Image Path")
+args = vars(ap.parse_args())
+
+root = tk.Tk()
+root.withdraw()
+
+# Open file dialog to select an image
+file_path = filedialog.askopenfilename()
+
+if file_path:
+    img_path = file_path
+elif args["image"]:
+    img_path = args["image"]
+else:
+    print("Please provide an image path")
+
+# Reading the image with opencv
+img = cv2.imread(img_path)
+
+# Declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+# Reading csv file with pandas and giving names to each column
+csv = pd.read_csv('colors.csv')
+
+# Function to calculate minimum distance from all colors and get the most matching color
+def getColorName(R, G, B):
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(R - int(csv.loc[i, "R"])) + abs(G - int(csv.loc[i, "G"])) + abs(B - int(csv.loc[i, "B"]))
+        if(d <= minimum):
+            minimum = d
+            cname = csv.loc[i, "color_name"]
+    return cname
+
+# Function to get x,y coordinates of mouse click
+def draw_function(event, x, y, flags, param):
+    if event == cv2.EVENT_MOUSEMOVE:
+        global b, g, r
+        b, g, r = img[y, x]
+        color_scanner = np.zeros((300, 300, 3), np.uint8)
+        color_scanner[:, :] = (b, g, r)
+        cv2.putText(color_scanner, "B: {} G: {} R: {}".format(b, g, r), (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        cv2.imshow('color_scanner', color_scanner)
+
+cv2.namedWindow('image')
+cv2.setMouseCallback('image', draw_function)
+
+
+while True:
+    # Set maximum size of the image
+    max_size = 800 
+
+    # Calculate the scale percent based on the maximum size and the image's original size
+    scale_percent = min(max_size / img.shape[1], max_size / img.shape[0]) * 100
+
+    # Calculate the new dimensions of the scaled image
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+
+    # Resize the image
+    scaled_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+
+    # Display the scaled image
+    cv2.imshow("image", scaled_img)
+
+    # Update the color rectangle and text when the user clicks on the image
+    # Update the color rectangle and text when the user clicks on the image
+    text = ""
+    if clicked:
+        cv2.rectangle(img, (20, 20), (750, 60), (b, g, r), -1)
+        text = getColorName(r, g, b) + ' R=' + str(r) + ' G=' + str(g) + ' B=' + str(b)
+
+    # Set font properties
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1
+    thickness = 2
+
+    # Get the size of the text
+    text_size, _ = cv2.getTextSize(text, font, font_scale, thickness)
+
+    # Position the text within the color rectangle
+    text_x = 50
+    text_y = 50
+    if text_x + text_size[0] >= img.shape[1]:
+        text_x = img.shape[1] - text_size[0] - 10
+    if text_y + text_size[1] >= img.shape[0]:
+        text_y = img.shape[0] - text_size[1] - 10
+
+    # Set the font color based on the brightness of the color
+    font_color = (0, 0, 0) if r + g + b >= 600 else (255, 255, 255)
+
+    # Add the text to the image
+    cv2.putText(img, text, (text_x, text_y), font, font_scale, font_color, thickness, cv2.LINE_AA)
+
+# Wait for the space bar to be pressed to scan colors
+    if cv2.waitKey(20) & 0xFF == 32:
+        cv2.destroyAllWindows()
+
+# Wait for the space bar to be pressed to scan colors
+    if cv2.waitKey(20) & 0xFF == 32:  
+     cv2.destroyAllWindows()
+
+    # Get the height and width of the image
+    h, w, _ = img.shape  
+
+    # Create an empty image for the color scan result
+    color_scan = np.zeros([h, w, 3], dtype=np.uint8)  
+
+    # Fill the color scan image with selected pixels if they exist within the image
+    if ypos - 10 >= 0 and ypos + 10 < h and xpos - 10 >= 0 and xpos + 10 < w:
+        color_scan[:, :, :] = img[ypos - 10:ypos + 10, xpos - 10:xpos + 10, :]
+
+    # Display the color scan result
+    cv2.imshow("Color Scan Result", color_scan)
+
+# Adding Zoom functionality
+    key = cv2.waitKey(1)
+    if key == ord('+'): # Zoom in
+        img = cv2.resize(img, None, fx=1.1, fy=1.1, interpolation=cv2.INTER_LINEAR)
+    elif key == ord('-'): # Zoom out
+        img = cv2.resize(img, None, fx=0.9, fy=0.9, interpolation=cv2.INTER_LINEAR)
+
+#Break the loop when user hits 'esc' key
+    if key == 27: # 'esc' key
+        break
+    elif cv2.getWindowProperty('image', cv2.WND_PROP_VISIBLE) < 1: # window closed by user
+        break
+cv2.destroyAllWindows()
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+import csv
+import os
+import cv2
+import numpy as np
+import pandas as pd
+import argparse
+import tkinter as tk
+from tkinter import filedialog
+from PIL import Image
+from webcolors import rgb_to_name, rgb_to_hex
+from tqdm import tqdm
+
+# Creating argument parser to take image path from command line
+ap = argparse.ArgumentParser()
+ap.add_argument('-i', '--image', required=False, help="Image Path")
+args = vars(ap.parse_args())
+
+root = tk.Tk()
+root.withdraw()
+
+# Open file dialog to select an image
+file_path = filedialog.askopenfilename()
+
+if file_path:
+    img_path = file_path
+elif args["image"]:
+    img_path = args["image"]
+else:
+    print("Please provide an image path")
+
+# Reading the image with opencv
+img = cv2.imread(img_path)
+
+# Declaring global variables (are used later on)
+clicked = False
+r = g = b = xpos = ypos = 0
+
+# Reading csv file with pandas and giving names to each column
+csv = pd.read_csv('named_colors.csv')
+
+# Create a dictionary to store the named colors found in the image
+named_colors = {}
+
+# Iterate through each pixel in the image and convert its RGB color to a named color (if possible)
+for pixel in tqdm(img.reshape(-1, 3), desc='Processing Image'):
+    try:
+        color_name = rgb_to_name(pixel)
+        hex_code = rgb_to_hex(pixel)
+        named_colors[color_name] = (hex_code, *pixel)
+    except ValueError:
+        pass
+
+# Save the named colors, their RGB values, and hex codes to a CSV file
+# Read existing data from CSV file if it exists
+csv_file = 'named_colors.csv'
+if os.path.exists(csv_file):
+    existing_rows = pd.read_csv(csv_file)
+else:
+    existing_rows = pd.DataFrame()
+
+# Loop through each named color and write to CSV file if it doesn't already exist
+with open(csv_file, 'a', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    if existing_rows.empty:
+        writer.writerow(['Color Name', 'Color Name (Title Case)', 'Hex Code', 'Red', 'Green', 'Blue'])
+    for color_name, color_data in tqdm(named_colors.items(), desc='Saving Data'):
+        hex_code, r, g, b = color_data
+        # Check if the color is already in the CSV file
+        color_exists = len(existing_rows.loc[(existing_rows['Color Name'] == color_name) & (existing_rows['Hex Code'] == hex_code) & (existing_rows['Red'] == r) & (existing_rows['Green'] == g) & (existing_rows['Blue'] == b)]) > 0
+        if not color_exists:
+            writer.writerow([color_name, f'{color_name.title()}', hex_code, r, g, b])
+            existing_rows = existing_rows.append(pd.DataFrame([[color_name, f'{color_name.title()}', hex_code, r, g, b]], columns=existing_rows.columns), ignore_index=True)
+
+# Write updated data to CSV file
+existing_rows.to_csv(csv_file, index=False)
+# Save the named colors, their RGB
+#Get the name of the input image file
+input_file_name = os.path.basename(image_file)
+
+#Create a new directory to store the output files
+output_directory = f"{os.path.splitext(input_file_name)[0]}_output"
+os.makedirs(output_directory, exist_ok=True)
+
+#Create a new image with the named colors marked on it
+output_image_file = os.path.join(output_directory, f"{os.path.splitext(input_file_name)[0]}_output.jpg")
+for color_name, color_data in tqdm(named_colors.items(), desc='Creating Output Image'):
+    hex_code, r, g, b = color_data
+    color_name = color_name.title()
+    color_bgr = (b, g, r)
+    cv2.rectangle(img, (0, 0), (img.shape[1], 25), (255, 255, 255), cv2.FILLED)
+    cv2.putText(img, f"{color_name}: {hex_code}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
+    cv2.rectangle(img, (0, 0), (50, 25), color_bgr, cv2.FILLED)
+    cv2.imwrite(output_image_file, img)
+
+print(f"Named colors saved to '{csv_file}' and output image saved to '{output_image_file}'")
