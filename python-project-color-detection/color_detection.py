@@ -31,7 +31,7 @@ clicked = False
 r = g = b = xpos = ypos = 0
 
 # Reading csv file with pandas and giving names to each column
-csv = pd.read_csv('colors.csv')
+csv = pd.read_csv('named_colors_output.csv')
 
 # Function to calculate minimum distance from all colors and get the most matching color
 def getColorName(R, G, B):
@@ -75,7 +75,6 @@ while True:
     # Display the scaled image
     cv2.imshow("image", scaled_img)
 
-    # Update the color rectangle and text when the user clicks on the image
     # Update the color rectangle and text when the user clicks on the image
     text = ""
     if clicked:
