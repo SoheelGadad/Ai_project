@@ -13,6 +13,7 @@ args = vars(ap.parse_args())
 root = tk.Tk()
 root.withdraw()
 
+
 # Open file dialog to select an image
 file_path = filedialog.askopenfilename()
 
@@ -110,25 +111,26 @@ while True:
 # Wait for the space bar to be pressed to scan colors
     if cv2.waitKey(20) & 0xFF == 32:  
      cv2.destroyAllWindows()
+    
+    PIXEL_RANGE = 10
 
-    # Get the height and width of the image
+# Get the height and width of the image
     h, w, _ = img.shape  
 
-    # Create an empty image for the color scan result
+# Create an empty image for the color scan result
     color_scan = np.zeros([h, w, 3], dtype=np.uint8)  
 
-    # Fill the color scan image with selected pixels if they exist within the image
-    if ypos - 10 >= 0 and ypos + 10 < h and xpos - 10 >= 0 and xpos + 10 < w:
-        color_scan[:, :, :] = img[ypos - 10:ypos + 10, xpos - 10:xpos + 10, :]
+# Fill the color scan image with selected pixels if they exist within the image
+    if ypos - PIXEL_RANGE >= 0 and ypos + PIXEL_RANGE < h and xpos - PIXEL_RANGE >= 0 and xpos + PIXEL_RANGE < w:
+        color_scan[(ypos-PIXEL_RANGE):(ypos+PIXEL_RANGE), (xpos-PIXEL_RANGE):(xpos+PIXEL_RANGE), :] = img[(ypos-PIXEL_RANGE):(ypos+PIXEL_RANGE), (xpos-PIXEL_RANGE):(xpos+PIXEL_RANGE), :]
 
-       # Create a named window for the color scan result
-    cv2.namedWindow("Color Scan Result", cv2.WINDOW_NORMAL)
-
-    # Resize the named window to a specific size
+# Create a named window for the color scan result and resize it
+    cv2.namedWindow("Color Scan Result", cv2.WINDOW_NORMAL | cv2.WINDOW_AUTOSIZE)
     cv2.resizeWindow("Color Scan Result", 400, 400)
 
-    # Display the color scan result
+# Display the color scan result
     cv2.imshow("Color Scan Result", color_scan)
+
 # Adding Zoom functionality
     key = cv2.waitKey(1)
     if key == ord('+'): # Zoom in
