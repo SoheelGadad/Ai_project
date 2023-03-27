@@ -87,7 +87,8 @@ while True:
     print("1. Check if a file exists")
     print("2. Open a text file")
     print("3. Open colorscanner.py")
-    print("4. Exit")
+    print("4. Open NavanAI's API")
+    print("5. Exit")
 
     choice = input("Enter your choice (1-4): ")
 
@@ -118,8 +119,16 @@ while True:
             os.system(f"python {file_path}")
         else:
             print("Invalid file path or file type. Please enter a valid path to a Python file.")
-    
     elif choice == '4':
+            # Open NavanAI's API
+            api_key = input("Please enter your NavanAI API key: ")
+            if api_key:
+                # Call NavanAI's API using the provided API key
+                print("Calling NavanAI's API...")
+                # TODO: Add API call here
+            else:
+                print("Invalid API key. Please enter a valid key.")
+    elif choice == '5':
         # Exit the program
         print("Goodbye!")
         break
