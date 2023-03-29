@@ -112,8 +112,6 @@ while True:
         img = cv2.resize(img, None, fx=1.9, fy=1.9, interpolation=cv2.INTER_LINEAR)
 # Declare global zoom level variable
     zoom_level = 100
-
-
     
 #Break the loop when user hits 'esc' key
     if key == 27: # 'esc' key
