@@ -100,7 +100,7 @@ while True:
 
     # Set the font color based on the brightness of the color
     font_color = (0, 0, 0) if r + g + b >= 600 else (255, 255, 255)
-
+      
     # Add the text to the image
     cv2.putText(img, text, (text_x, text_y), font, font_scale, font_color, thickness, cv2.LINE_AA)
 
@@ -112,7 +112,7 @@ while True:
     if cv2.waitKey(20) & 0xFF == 32:  
      cv2.destroyAllWindows()
     
-    PIXEL_RANGE = 10
+    PIXEL_RANGE = 40
 
 # Get the height and width of the image
     h, w, _ = img.shape  
@@ -136,7 +136,7 @@ while True:
     if key == ord('+'): # Zoom in
         img = cv2.resize(img, None, fx=1.1, fy=1.1, interpolation=cv2.INTER_LINEAR)
     elif key == ord('-'): # Zoom out
-        img = cv2.resize(img, None, fx=0.9, fy=0.9, interpolation=cv2.INTER_LINEAR)
+        img = cv2.resize(img, None, fx=1.9, fy=1.9, interpolation=cv2.INTER_LINEAR)
 
 #Break the loop when user hits 'esc' key
     if key == 27: # 'esc' key
