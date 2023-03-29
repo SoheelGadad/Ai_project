@@ -115,21 +115,6 @@ while True:
     # Get the height and width of the image
     h, w, _ = img.shape  
 
-    # Create an empty image for the color scan result
-    color_scan = np.zeros([h, w, 3], dtype=np.uint8)  
-
-    # Fill the color scan image with selected pixels if they exist within the image
-    if ypos - 10 >= 0 and ypos + 10 < h and xpos - 10 >= 0 and xpos + 10 < w:
-        color_scan[:, :, :] = img[ypos - 10:ypos + 10, xpos - 10:xpos + 10, :]
-
-       # Create a named window for the color scan result
-    cv2.namedWindow("Color Scan Result", cv2.WINDOW_NORMAL)
-
-    # Resize the named window to a specific size
-    cv2.resizeWindow("Color Scan Result", 400, 400)
-
-    # Display the color scan result
-    cv2.imshow("Color Scan Result", color_scan)
 # Adding Zoom functionality
     key = cv2.waitKey(1)
     if key == ord('+'): # Zoom in
