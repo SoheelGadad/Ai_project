@@ -113,31 +113,7 @@ while True:
 # Declare global zoom level variable
     zoom_level = 100
 
-# Define callback function for mouse events
-    def zoom_function(event, x, y, flags, param):
-        global zoom_level
-        if event == cv2.EVENT_MOUSEWHEEL:
-        # Get the scroll direction (-1 for down, 1 for up)
-            scroll_dir = event // abs(event)
-        # Adjust the zoom level by a factor of 10%
-            zoom_level = max(10, min(1000, zoom_level + scroll_dir * 10))
-        # Resize the image based on the new zoom level
-            scale_percent = zoom_level / 100
-            width = int(img.shape[1] * scale_percent)
-            height = int(img.shape[0] * scale_percent)
-            dim = (width, height)
-            scaled_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-            cv2.imshow("image", scaled_img)
 
-# Register the zoom function with the mouse callback
-    cv2.setMouseCallback('image', zoom_function)
-
-# Display the original image
-    cv2.imshow("image", img)
-
-# Wait for the user to close the window
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
     
 #Break the loop when user hits 'esc' key
     if key == 27: # 'esc' key
