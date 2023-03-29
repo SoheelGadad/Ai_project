@@ -38,7 +38,8 @@ csv = pd.read_csv('named_colors_output.csv')
 def getColorName(R, G, B):
     minimum = 10000
     for i in range(len(csv)):
-        d = abs(R - int(csv.loc[i, "R"])) + abs(G - int(csv.loc[i, "G"])) + abs(B - int(csv.loc[i, "B"]))
+        color = [int(csv.loc[i, "R"]), int(csv.loc[i, "G"]), int(csv.loc[i, "B"])]
+        d = get_distance(color, [R, G, B])
         if(d <= minimum):
             minimum = d
             cname = csv.loc[i, "color_name"]
@@ -51,7 +52,8 @@ def draw_function(event, x, y, flags, param):
         b, g, r = img[y, x]
         color_scanner = np.zeros((300, 300, 3), np.uint8)
         color_scanner[:, :] = (b, g, r)
-        cv2.putText(color_scanner, "B: {} G: {} R: {}".format(b, g, r), (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        color_name = getColorName(r, g, b)
+        cv2.putText(color_scanner, "B: {} G: {} R: {} {}".format(b, g, r, color_name), (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         cv2.imshow('color_scanner', color_scanner)
 
 cv2.namedWindow('image')
