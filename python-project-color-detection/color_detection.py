@@ -104,40 +104,40 @@ while True:
     # Add the text to the image
     cv2.putText(img, text, (text_x, text_y), font, font_scale, font_color, thickness, cv2.LINE_AA)
 
-# Wait for the space bar to be pressed to scan colors
-    if cv2.waitKey(20) & 0xFF == 32:
-        cv2.destroyAllWindows()
-
-# Wait for the space bar to be pressed to scan colors
-    if cv2.waitKey(20) & 0xFF == 32:  
-     cv2.destroyAllWindows()
-    
-    PIXEL_RANGE = 40
-
-# Get the height and width of the image
-    h, w, _ = img.shape  
-
-# Create an empty image for the color scan result
-    color_scan = np.zeros([h, w, 3], dtype=np.uint8)  
-
-# Fill the color scan image with selected pixels if they exist within the image
-    if ypos - PIXEL_RANGE >= 0 and ypos + PIXEL_RANGE < h and xpos - PIXEL_RANGE >= 0 and xpos + PIXEL_RANGE < w:
-        color_scan[(ypos-PIXEL_RANGE):(ypos+PIXEL_RANGE), (xpos-PIXEL_RANGE):(xpos+PIXEL_RANGE), :] = img[(ypos-PIXEL_RANGE):(ypos+PIXEL_RANGE), (xpos-PIXEL_RANGE):(xpos+PIXEL_RANGE), :]
-
-# Create a named window for the color scan result and resize it
-    cv2.namedWindow("Color Scan Result", cv2.WINDOW_NORMAL | cv2.WINDOW_AUTOSIZE)
-    cv2.resizeWindow("Color Scan Result", 400, 400)
-
-# Display the color scan result
-    cv2.imshow("Color Scan Result", color_scan)
-
 # Adding Zoom functionality
     key = cv2.waitKey(1)
     if key == ord('+'): # Zoom in
         img = cv2.resize(img, None, fx=1.1, fy=1.1, interpolation=cv2.INTER_LINEAR)
     elif key == ord('-'): # Zoom out
         img = cv2.resize(img, None, fx=1.9, fy=1.9, interpolation=cv2.INTER_LINEAR)
+    # Declare global zoom level variable
+    zoom_level = 100
 
+# Define callback function for mouse events
+    def zoom_function(event, x, y, flags, param):
+        global zoom_level
+        if event == cv2.EVENT_MOUSEWHEEL:
+        # Get the scroll direction (-1 for down, 1 for up)
+            scroll_dir = event // abs(event)
+        # Adjust the zoom level by a factor of 10%
+        zoom_level = max(10, min(1000, zoom_level + scroll_dir * 10))
+        # Resize the image based on the new zoom level
+        scale_percent = zoom_level / 100
+        width = int(img.shape[1] * scale_percent)
+        height = int(img.shape[0] * scale_percent)
+        dim = (width, height)
+        scaled_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+        cv2.imshow("image", scaled_img)
+
+# Register the zoom function with the mouse callback
+    cv2.setMouseCallback('image', zoom_function)
+
+# Display the original image
+    cv2.imshow("image", img)
+
+# Wait for the user to close the window
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 #Break the loop when user hits 'esc' key
     if key == 27: # 'esc' key
          break
